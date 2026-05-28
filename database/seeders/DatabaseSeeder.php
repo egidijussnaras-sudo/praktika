@@ -10,13 +10,15 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Pirmiausia paleidžiame miestus ir studentus
+        $this->call([
+            CitySeeder::class,
+            StudentSeeder::class,
+        ]);
 
+        // Paliekame Jetstream vartotojo kūrimą, kad veiktų prisijungimas
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
