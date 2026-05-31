@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,11 +24,13 @@ Route::get('/contacts', [ContactController::class, 'index'])
     ->name('contacts.index');
 
 
-// Protected: tik prisijungę gali kurti / siųsti formą
+// Protected: tik prisijungę vartotojai gali pasiekti finansus ir kontaktus
 Route::middleware('auth')->group(function () {
     Route::resource('contacts', ContactController::class)
         ->only(['create', 'store']);
+        
+    Route::resource('categories', CategoryController::class);
+    Route::resource('transactions', TransactionController::class);
 });
 
 Route::resource('students', StudentController::class);
-Route::resource('categories', CategoryController::class);
