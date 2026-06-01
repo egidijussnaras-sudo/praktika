@@ -7,7 +7,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('transactions.index');
 });
 
 Route::middleware([
