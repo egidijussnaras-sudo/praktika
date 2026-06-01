@@ -9,23 +9,28 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    // 1. Rodyti visų operacijų sąrašą ir bendrą likutį
-    public function index()
+// 1. Rodyti visų operacijų sąrašą su filtravimu ir bendrą likutį
+    public function index(Request $request)
     {
         $userId = Auth::id();
+        $filter = $request->query('type'); // Pasiimame filtrą iš adreso (pvz., ?type=income)
 
-        // Pasiimame tik šio prisijungusio vartotojo operacijas (su kategorijų informacija)
-        $transactions = Transaction::where('user_id', $userId)
-            ->with('category')
-            ->orderBy('date', 'desc')
-            ->get();
+        // Pradinė užklausa: tik šio vartotojo įrašai
+        $query = Transaction::where('user_id', $userId)->with('category');
 
-        // Skaičiuojame sumas
+        // Jei pasirinktas konkretus filtras, pritaikome jį sąrašui
+        if (in_array($filter, ['income', 'expense'])) {
+            $query->where('type', $filter);
+        }
+
+        $transactions = $query->orderBy('date', 'desc')->get();
+
+        // Suminiai skaičiavimai visada lieka bendri (nepriklauso nuo filtro)
         $totalIncome = Transaction::where('user_id', $userId)->where('type', 'income')->sum('amount');
         $totalExpense = Transaction::where('user_id', $userId)->where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpense;
 
-        return view('transactions.index', compact('transactions', 'totalIncome', 'totalExpense', 'balance'));
+        return view('transactions.index', compact('transactions', 'totalIncome', 'totalExpense', 'balance', 'filter'));
     }
 
     // 2. Rodyti naujos operacijos pridėjimo formą

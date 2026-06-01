@@ -7,7 +7,6 @@
         <div class="col-md-12 d-flex justify-content-between align-items-center">
             <h2>Asmeninių finansų apskaita</h2>
             <div>
-                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary me-2">Valdyti kategorijas</a>
                 <a href="{{ route('transactions.create') }}" class="btn btn-success">Pridėti įrašą</a>
             </div>
         </div>
@@ -43,7 +42,20 @@
             </div>
         </div>
     </div>
+    
+<div class="card mb-3">
+        <div class="card-body bg-light d-flex align-items-center justify-content-between py-2">
+            <span class="text-muted fw-bold">Filtruoti įrašus:</span>
+            <div class="btn-group">
+                <a href="{{ route('transactions.index') }}" class="btn btn-sm {{ request('type') == '' ? 'btn-dark' : 'btn-outline-dark' }}">Visi</a>
+                <a href="{{ route('transactions.index', ['type' => 'income']) }}" class="btn btn-sm {{ request('type') == 'income' ? 'btn-success' : 'btn-outline-success' }}">Tik pajamos</a>
+                <a href="{{ route('transactions.index', ['type' => 'expense']) }}" class="btn btn-sm {{ request('type') == 'expense' ? 'btn-danger' : 'btn-outline-danger' }}">Tik išlaidos</a>
+            </div>
+        </div>
+    </div>
 
+    <div class="card">
+        <div class="card-header bg-dark text-white">Paskutinės operacijos</div>
     <div class="card">
         <div class="card-header bg-dark text-white">Paskutinės operacijos</div>
         <div class="card-body">
