@@ -77,4 +77,47 @@ class TransactionController extends Controller
         $transaction->delete();
         return redirect()->route('transactions.index')->with('success', 'Įrašas ištrintas!');
     }
+
+    // 5. Generuoti finansinę ataskaitą pagal 3 pjūvius (Kategorijos, Periodas, Analizė)
+    public function report()
+    {
+        $userId = Auth::id();
+
+        // 1 PJŪVIS: Suminė ataskaita pagal kategorijas
+        // Sugrupuojame vartotojo operacijas pagal kategorijos pavadinimą ir tipą, bei susumuojame sumas
+        $categoriesData = Transaction::where('transactions.user_id', $userId)
+            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->selectRaw('categories.name as category_name, categories.type as category_type, SUM(transactions.amount) as total_amount')
+            ->groupBy('categories.name', 'categories.type')
+            ->get();
+
+        // 2 PJŪVIS: Periodo ataskaita (Einamojo mėnesio statistika)
+        $currentMonthCount = Transaction::where('user_id', $userId)
+            ->whereMonth('date', date('m'))
+            ->whereYear('date', date('Y'))
+            ->count();
+
+        $currentMonthSum = Transaction::where('user_id', $userId)
+            ->whereMonth('date', date('m'))
+            ->whereYear('date', date('Y'))
+            ->where('type', 'expense')
+            ->sum('amount');
+
+        // 3 PJŪVIS: Finansinė analizė (Max, Min, Vidurkis) tik išlaidoms
+        $expenseQuery = Transaction::where('user_id', $userId)->where('type', 'expense');
+        
+        $maxExpense = $expenseQuery->max('amount') ?? 0;
+        $minExpense = $expenseQuery->min('amount') ?? 0;
+        $avgExpense = $expenseQuery->avg('amount') ?? 0;
+
+        return view('transactions.report', compact(
+            'categoriesData', 
+            'currentMonthCount', 
+            'currentMonthSum', 
+            'maxExpense', 
+            'minExpense', 
+            'avgExpense'
+        ));
+    }
+
 }

@@ -24,6 +24,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('transactions.index') }}">Mano Finansai</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('transactions.report') }}">Ataskaitos</a>
+                        </li>
                     @endauth
                 </ul>
 
